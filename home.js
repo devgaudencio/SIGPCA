@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const itensTableBody = document.getElementById('itensTableBody');
     const gSignInWrapper = document.getElementById('gSignInWrapper');
     const loginGoogleBtn = document.getElementById('loginGoogleBtn');
+    const loginEmailForm = document.getElementById('loginEmailForm');
 
     // Títulos das páginas
     const pageTitles = {
@@ -745,4 +746,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     window.addEventListener('DOMContentLoaded', startLoginParticles);
+
+    // Login Email
+    if (loginEmailForm) {
+        loginEmailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const senha = document.getElementById('loginSenha').value;
+            const loginError = document.getElementById('loginError');
+            auth.signInWithEmailAndPassword(email, senha)
+                .then(result => {
+                    // O onAuthStateChanged já cuida do fluxo
+                })
+                .catch(error => {
+                    if (loginError) loginError.textContent = 'Erro no login: ' + (error.message || 'Verifique usuário e senha.');
+                });
+        });
+    }
 });

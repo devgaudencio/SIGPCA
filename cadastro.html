@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Itens - SIGPCA</title>
+    <link rel="stylesheet" href="home.css">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDBt9_pG-9uNyMEeMq4UnRDV7EjQSjV_o0",
+        authDomain: "sigpca-afac4.firebaseapp.com",
+        projectId: "sigpca-afac4",
+        storageBucket: "sigpca-afac4.appspot.com",
+        messagingSenderId: "528402082133",
+        appId: "1:528402082133:web:a3f9691545858de44b67dc",
+        measurementId: "G-8RC4CP7RZ2"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-building"></i> SIGPCA</h2>
+                <p>Sistema de Contratações</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item" onclick="window.location.href='index.html'">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="menu-item active">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Cadastro</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='notificacoes.html'">
+                    <i class="fas fa-bell"></i>
+                    <span>Notificações</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='configuracoes.html'">
+                    <i class="fas fa-cog"></i>
+                    <span>Configurações</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='academy.html'">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>SIGPCAAcademy</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="sidebarUser">Usuário</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </button>
+            </div>
+        </nav>
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="top-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-title">
+                    <h1 id="pageTitle">Cadastro de Itens</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="notification-btn" onclick="window.location.href='notificacoes.html'">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="profile-btn" onclick="window.location.href='configuracoes.html'">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+            </header>
+            <div class="content-area">
+                <!-- Cadastro Section -->
+                <section id="cadastro" class="content-section active">
+                    <!-- Aqui vai o conteúdo do cadastro de itens -->
+                    <!-- Você pode copiar o conteúdo da seção de cadastro do index.html -->
+                    <div class="section-header">
+                        <div class="search-bar">
+                            <input type="text" id="itemSearchInput" placeholder="Pesquisar itens..." autocomplete="off">
+                            <button class="filter-btn" id="itemFilterBtn" title="Filtros avançados (em breve)"><i class="fas fa-filter"></i></button>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn-secondary" id="importBtn">
+                                <i class="fas fa-file-import"></i>
+                                Importar
+                            </button>
+                            <button class="btn-primary" id="openItemModalBtn">
+                                <i class="fas fa-plus"></i>
+                                Novo Item
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container" id="itensTableContainer">
+                        <table class="itens-table">
+                            <thead>
+                                <tr>
+                                    <th>Nº Item</th>
+                                    <th>Classificação</th>
+                                    <th>Descrição</th>
+                                    <th>Unidade</th>
+                                    <th>Quantitativo</th>
+                                    <th>Valor Unitário</th>
+                                    <th>Valor Total</th>
+                                    <th>Fonte de Recurso</th>
+                                    <th>Programa</th>
+                                    <th>Prioridade</th>
+                                    <th>Forma da Contratação</th>
+                                    <th>Início</th>
+                                    <th>Fim</th>
+                                    <th>Justificativa</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itensTableBody">
+                                <tr class="no-items-row"><td colspan="15" style="text-align:center;color:#aaa;">Nenhum item cadastrado</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Modal de cadastro de item (pode ser copiado do index.html) -->
+                    <!-- ... -->
+                </section>
+            </div>
+        </main>
+    </div>
+    <footer class="main-footer">
+        SIGPCA - <a href="https://www.instagram.com/gaudencio.dev/" target="_blank" class="footer-link">@Gaudencio.dev</a>
+    </footer>
+    <script src="home.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+</body>
+</html> 

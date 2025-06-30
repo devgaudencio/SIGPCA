@@ -343,7 +343,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    transition: all 0.3s ease;
+    transition: none;
 }
 
 .btn-primary {
@@ -503,6 +503,12 @@ body {
 
 .modal-overlay.active {
     display: flex;
+}
+
+.modal-overlay:not(.active) {
+    display: none !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
 }
 
 .modal {
