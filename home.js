@@ -525,6 +525,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function openPerfilModal() {
         perfilModalOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        const user = auth.currentUser;
+        if (user) carregarPerfil(user);
     }
     function closePerfilModal() {
         perfilModalOverlay.classList.remove('active');
