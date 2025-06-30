@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutBtn = document.querySelector('.logout-btn');
     const notificationBtn = document.querySelector('.notification-btn');
     const profileBtn = document.querySelector('.profile-btn');
+    const perfilForm = document.getElementById('perfilForm');
+    const itemForm = document.getElementById('itemForm');
+    const itensTableBody = document.getElementById('itensTableBody');
+    const gSignInWrapper = document.getElementById('gSignInWrapper');
+    const loginGoogleBtn = document.getElementById('loginGoogleBtn');
 
     // Títulos das páginas
     const pageTitles = {
@@ -322,7 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const openItemModalBtn = document.querySelector('.btn-primary'); // Botão "Novo Item"
     const closeItemModalBtn = document.getElementById('closeItemModal');
     const cancelItemModalBtn = document.getElementById('cancelItemModal');
-    const itemForm = document.getElementById('itemForm');
     const itemQty = document.getElementById('itemQty');
     const itemUnitValue = document.getElementById('itemUnitValue');
     const itemTotalValue = document.getElementById('itemTotalValue');
@@ -377,29 +381,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // === ITENS CADASTRADOS ===
     let itensCadastrados = [];
     const itensTableContainer = document.getElementById('itensTableContainer');
-    const itensTableBody = document.getElementById('itensTableBody');
     const cadastroPlaceholder = document.getElementById('cadastroPlaceholder');
     let editIndex = null; // Índice do item sendo editado
     let searchTerm = '';
 
     // Função para renderizar a tabela de itens (com filtro)
-    function renderItensTable() {
+    function renderItensTable(itens) {
         document.querySelectorAll('.itens-table th').forEach(th => th.classList.add('resizable'));
-        let itensFiltrados = itensCadastrados;
-        if (searchTerm.trim() !== '') {
-            const termo = searchTerm.trim().toLowerCase();
-            itensFiltrados = itensCadastrados.filter(item => {
-                return Object.values(item).some(val =>
-                    (val + '').toLowerCase().includes(termo)
-                );
-            });
-        }
-        if (itensFiltrados.length === 0) {
+        if (itens.length === 0) {
             itensTableBody.innerHTML = '<tr class="no-items-row"><td colspan="15" style="text-align:center;color:#aaa;">Nenhum item cadastrado</td></tr>';
             return;
         }
         itensTableBody.innerHTML = '';
-        itensFiltrados.forEach((item, idx) => {
+        itens.forEach((item, idx) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${item.itemNumber}</td>
@@ -466,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function deletarItem(idx) {
         if (confirm('Tem certeza que deseja excluir este item?')) {
             itensCadastrados.splice(idx, 1);
-            renderItensTable();
+            renderItensTable(itensCadastrados);
         }
     }
 
@@ -474,14 +468,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (itemForm) {
         itemForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return alert('Faça login primeiro!');
             const formData = new FormData(itemForm);
             const item = {
+                userId: user.uid,
+                userEmail: user.email,
                 itemNumber: formData.get('itemNumber'),
                 itemClass: formData.get('itemClass'),
                 itemDesc: formData.get('itemDesc'),
                 itemUnit: formData.get('itemUnit'),
                 itemQty: formData.get('itemQty'),
-                itemUnitValue: parseFloat(formData.get('itemUnitValue')).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                itemUnitValue: formData.get('itemUnitValue'),
                 itemTotalValue: itemTotalValue.value,
                 itemFonte: formData.get('itemFonte'),
                 itemPrograma: formData.get('itemPrograma'),
@@ -489,16 +487,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 itemForma: formData.get('itemForma'),
                 itemInicio: formData.get('itemInicio'),
                 itemFim: formData.get('itemFim'),
-                itemJustificativa: formData.get('itemJustificativa')
+                itemJustificativa: formData.get('itemJustificativa'),
+                criadoEm: firebase.firestore.FieldValue.serverTimestamp()
             };
-            if (editIndex !== null) {
-                itensCadastrados[editIndex] = item;
-                editIndex = null;
-            } else {
-                itensCadastrados.push(item);
-            }
-            renderItensTable();
-            closeItemModal();
+            db.collection('itens').add(item)
+                .then(() => {
+                    alert('Item cadastrado!');
+                    listarItensDoUsuario(user);
+                    closeItemModal();
+                })
+                .catch(err => alert('Erro ao salvar item: ' + err.message));
         });
     }
 
@@ -507,12 +505,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (itemSearchInput) {
         itemSearchInput.addEventListener('input', function() {
             searchTerm = this.value;
-            renderItensTable();
+            renderItensTable(itensCadastrados);
         });
     }
 
     // Renderiza a tabela ao carregar a página
-    renderItensTable();
+    renderItensTable(itensCadastrados);
 
     // === MODAL PERFIL E SEGURANÇA ===
     const perfilSegurancaBtn = document.getElementById('perfilSegurancaBtn');
@@ -523,7 +521,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const alterarFotoBtn = document.getElementById('alterarFotoBtn');
     const perfilFotoInput = document.getElementById('perfilFotoInput');
     const perfilFotoPreview = document.getElementById('perfilFotoPreview');
-    const perfilForm = document.getElementById('perfilForm');
 
     function openPerfilModal() {
         perfilModalOverlay.classList.add('active');
@@ -559,104 +556,88 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // === GOOGLE IDENTITY SERVICES (GIS) LOGIN E AUTORIZAÇÃO ===
-    const CLIENT_ID = '165495776336-46sf063kpq4hr9udih5ln760luuu3m0m.apps.googleusercontent.com';
-    const SHEET_ID = '1PLm-xHvgAOjhRe1Y4CIKYa1rYxTryUE3USpBs3ZGw84';
-    const SHEET_ACESSOS_RANGE = 'ACESSOS!A:A';
-    let userEmail = null;
-    let accessToken = null;
+    // === FIREBASE AUTH + FIRESTORE ===
 
+    // Funções de exibição
     function showApp() {
         document.getElementById('login').style.display = 'none';
         document.getElementById('app').style.display = '';
-        document.getElementById('login-bg-anim').style.display = 'none'; // Oculta fundo animado
+        document.getElementById('login-bg-anim').style.display = 'none';
     }
     function hideApp() {
         document.getElementById('login').style.display = '';
         document.getElementById('app').style.display = 'none';
-        document.getElementById('login-bg-anim').style.display = ''; // Mostra fundo animado
+        document.getElementById('login-bg-anim').style.display = '';
     }
 
-    window.onload = function() {
-        if (window.google && window.google.accounts && window.google.accounts.id) {
-            google.accounts.id.initialize({
-                client_id: CLIENT_ID,
-                callback: handleCredentialResponse
-            });
-            google.accounts.id.renderButton(
-                document.getElementById('gSignInWrapper'),
-                { theme: 'outline', size: 'large' }
-            );
+    // Login Google
+    if (loginGoogleBtn) {
+        loginGoogleBtn.onclick = function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    const user = result.user;
+                    showApp();
+                    carregarPerfil(user);
+                    listarItensDoUsuario(user);
+                })
+                .catch(error => {
+                    alert('Erro no login: ' + error.message);
+                });
+        };
+    }
+
+    // Detecta login automático
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            showApp();
+            carregarPerfil(user);
+            listarItensDoUsuario(user);
         } else {
-            setTimeout(window.onload, 100);
+            hideApp();
         }
-    };
+    });
 
-    function handleCredentialResponse(response) {
-        // Decodifica o JWT para pegar o e-mail
-        const payload = JSON.parse(atob(response.credential.split('.')[1]));
-        userEmail = payload.email;
-        // Agora, obtenha o access_token para usar na API
-        getAccessToken();
+    // CRUD de Perfil
+    if (perfilForm) {
+        perfilForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return alert('Faça login primeiro!');
+            const dadosPerfil = {
+                nome: user.displayName,
+                email: user.email,
+                telefone: perfilForm.perfilTelefone.value,
+                secretaria: perfilForm.perfilSecretaria.value
+            };
+            db.collection('usuarios').doc(user.uid).set(dadosPerfil, { merge: true })
+                .then(() => {
+                    alert('Perfil salvo!');
+                    closePerfilModal();
+                })
+                .catch(err => alert('Erro ao salvar perfil: ' + err.message));
+        });
     }
-
-    function getAccessToken() {
-        google.accounts.oauth2.initTokenClient({
-            client_id: CLIENT_ID,
-            scope: 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets',
-            callback: (tokenResponse) => {
-                accessToken = tokenResponse.access_token;
-                checkUserAccess();
-            }
-        }).requestAccessToken();
-    }
-
-    function carregarPerfilUsuario() {
-        if (!accessToken || !userEmail) return;
-        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PERFIL!A1:Z1000`, {
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.values || !perfilForm) return;
-            const header = data.values[0].map(h => h.trim().toLowerCase());
-            const emailIdx = header.indexOf('email');
-            if (emailIdx === -1) return;
-            const userRow = data.values.find((row, idx) => idx > 0 && row[emailIdx] && row[emailIdx].toLowerCase() === userEmail.toLowerCase());
-            if (userRow) {
-                // Preencher campos conforme o cabeçalho
-                const getVal = (col) => {
-                    const idx = header.indexOf(col);
-                    return idx !== -1 ? (userRow[idx] || '') : '';
-                };
-                perfilForm.perfilTelefone.value = getVal('telefone');
-                perfilForm.perfilEmail.value = getVal('email');
-                perfilForm.perfilId.value = getVal('id');
-                perfilForm.perfilSecretaria.value = getVal('secretaria');
-                // Não preencher senha por segurança
+    function carregarPerfil(user) {
+        db.collection('usuarios').doc(user.uid).get().then(doc => {
+            if (doc.exists && perfilForm) {
+                const dados = doc.data();
+                perfilForm.perfilTelefone.value = dados.telefone || '';
+                perfilForm.perfilEmail.value = dados.email || '';
+                perfilForm.perfilId.value = user.uid;
+                perfilForm.perfilSecretaria.value = dados.secretaria || '';
             }
         });
     }
 
-    function checkUserAccess() {
-        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_ACESSOS_RANGE}`, {
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            const emails = (data.values || []).flat().map(e => e.trim().toLowerCase());
-            if (emails.includes(userEmail.toLowerCase())) {
-                showApp();
-                carregarPerfilUsuario(); // Carrega dados do perfil ao logar
-            } else {
-                document.getElementById('loginError').textContent = 'Acesso negado! Seu e-mail não está autorizado.';
-                hideApp();
-            }
-        });
+    // CRUD de Itens
+    function listarItensDoUsuario(user) {
+        db.collection('itens').where('userId', '==', user.uid).orderBy('criadoEm', 'desc').get()
+            .then(snapshot => {
+                const itens = [];
+                snapshot.forEach(doc => itens.push({ id: doc.id, ...doc.data() }));
+                renderItensTable(itens);
+            });
     }
 
     // === EFEITO DE PARTÍCULAS NA TELA DE LOGIN ===
@@ -748,42 +729,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     window.addEventListener('DOMContentLoaded', startLoginParticles);
-
-    // Salvar perfil ao submeter o formulário usando fetch + accessToken GIS
-    if (typeof perfilForm !== 'undefined' && perfilForm) {
-        perfilForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (!accessToken) {
-                alert('Você precisa estar autenticado para salvar o perfil.');
-                return;
-            }
-            const profileData = [
-                perfilForm.perfilTelefone.value,
-                perfilForm.perfilEmail.value,
-                perfilForm.perfilId.value,
-                perfilForm.perfilSecretaria.value,
-                perfilForm.perfilSenha.value
-            ];
-            fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PERFIL!A1:append?valueInputOption=RAW`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + accessToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ values: [profileData] })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.updates) {
-                    alert('Perfil salvo com sucesso na planilha Google!');
-                    closePerfilModal();
-                } else {
-                    alert('Erro ao salvar perfil: ' + (data.error && data.error.message ? data.error.message : 'Erro desconhecido'));
-                }
-            })
-            .catch(err => {
-                alert('Erro ao salvar perfil: ' + err.message);
-            });
-        });
-    }
 });

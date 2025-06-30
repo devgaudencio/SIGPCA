@@ -1177,15 +1177,14 @@ body.cadastro-modal-open .modal {
     box-shadow: none !important;
 }
 .footer-link {
-    color: #fff !important;
+    color: #764ba2;
     font-weight: 700;
     text-decoration: none;
     transition: color 0.2s, text-shadow 0.2s;
-    text-shadow: 0 2px 12px #764ba2cc, 0 0 8px #667eea99, 0 0 2px #fff;
 }
 .footer-link:hover {
-    color: #ffd700 !important;
-    text-shadow: 0 2px 16px #764ba2cc, 0 0 12px #667eea, 0 0 4px #fff;
+    color: #fff;
+    text-shadow: 0 2px 12px #764ba2cc, 0 0 8px #667eea99;
     text-decoration: underline;
 }
 @media (max-width: 600px) {
