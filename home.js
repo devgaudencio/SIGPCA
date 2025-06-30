@@ -559,87 +559,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // === GOOGLE SHEETS INTEGRAÇÃO PERFIL ===
+    // === GOOGLE IDENTITY SERVICES (GIS) LOGIN E AUTORIZAÇÃO ===
     const CLIENT_ID = '165495776336-46sf063kpq4hr9udih5ln760luuu3m0m.apps.googleusercontent.com';
     const SHEET_ID = '1PLm-xHvgAOjhRe1Y4CIKYa1rYxTryUE3USpBs3ZGw84';
-    const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-
-    function handleClientLoad() {
-        gapi.load('client:auth2', initClient);
-    }
-
-    function initClient() {
-        gapi.client.init({
-            clientId: CLIENT_ID,
-            discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-            scope: SCOPES
-        });
-    }
-
-    // Chama handleClientLoad ao carregar a página, aguardando o gapi estar disponível
-    function waitForGapiAndInit() {
-        if (window.gapi && window.gapi.load) {
-            handleClientLoad();
-        } else {
-            setTimeout(waitForGapiAndInit, 100);
-        }
-    }
-    window.addEventListener('load', waitForGapiAndInit);
-
-    function signInAndSaveProfile(profileData, onSuccess, onError) {
-        gapi.auth2.getAuthInstance().signIn().then(() => {
-            gapi.client.sheets.spreadsheets.values.append({
-                spreadsheetId: SHEET_ID,
-                range: "PERFIL!A1",
-                valueInputOption: "RAW",
-                insertDataOption: "INSERT_ROWS",
-                resource: {
-                    values: [
-                        [
-                            profileData.telefone,
-                            profileData.email,
-                            profileData.id,
-                            profileData.secretaria,
-                            profileData.senha
-                        ]
-                    ]
-                }
-            }).then(response => {
-                if (onSuccess) onSuccess(response);
-            }, error => {
-                if (onError) onError(error);
-            });
-        });
-    }
-
-    // Salvar perfil ao submeter o formulário
-    if (perfilForm) {
-        perfilForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const profileData = {
-                telefone: perfilForm.perfilTelefone.value,
-                email: perfilForm.perfilEmail.value,
-                id: perfilForm.perfilId.value,
-                secretaria: perfilForm.perfilSecretaria.value,
-                senha: perfilForm.perfilSenha.value
-            };
-            if (window.gapi && gapi.auth2) {
-                signInAndSaveProfile(profileData, function() {
-                    alert('Perfil salvo com sucesso na planilha Google!');
-                    closePerfilModal();
-                }, function(error) {
-                    alert('Erro ao salvar perfil: ' + error.result.error.message);
-                });
-            } else {
-                alert('Google API não carregada. Tente recarregar a página.');
-            }
-        });
-    }
-
-    // === LOGIN GOOGLE E AUTORIZAÇÃO ===
     const SHEET_ACESSOS_RANGE = 'ACESSOS!A:A';
     let userEmail = null;
-    let gapiReady = false;
+    let accessToken = null;
 
     function showApp() {
         document.getElementById('login').style.display = 'none';
@@ -650,52 +575,55 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('app').style.display = 'none';
     }
 
-    function onGoogleSignIn(response) {
-        // Decodifica o JWT do Google Identity Services
-        const idToken = response.credential;
-        const payload = JSON.parse(atob(idToken.split('.')[1]));
-        userEmail = payload.email;
-        // Após login, inicializa gapi e verifica acesso
-        waitForGapiAndInit();
-        checkUserAccess();
-    }
-
-    function renderGoogleSignIn() {
+    window.onload = function() {
         if (window.google && window.google.accounts && window.google.accounts.id) {
-            window.google.accounts.id.initialize({
+            google.accounts.id.initialize({
                 client_id: CLIENT_ID,
-                callback: onGoogleSignIn
+                callback: handleCredentialResponse
             });
-            window.google.accounts.id.renderButton(
+            google.accounts.id.renderButton(
                 document.getElementById('gSignInWrapper'),
                 { theme: 'outline', size: 'large' }
             );
         } else {
-            setTimeout(renderGoogleSignIn, 100);
+            setTimeout(window.onload, 100);
         }
+    };
+
+    function handleCredentialResponse(response) {
+        // Decodifica o JWT para pegar o e-mail
+        const payload = JSON.parse(atob(response.credential.split('.')[1]));
+        userEmail = payload.email;
+        // Agora, obtenha o access_token para usar na API
+        getAccessToken();
     }
-    window.addEventListener('DOMContentLoaded', renderGoogleSignIn);
+
+    function getAccessToken() {
+        google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets',
+            callback: (tokenResponse) => {
+                accessToken = tokenResponse.access_token;
+                checkUserAccess();
+            }
+        }).requestAccessToken();
+    }
 
     function checkUserAccess() {
-        if (!userEmail || !gapiReady) {
-            setTimeout(checkUserAccess, 200);
-            return;
-        }
-        // Lê a lista de e-mails autorizados da aba ACESSOS
-        gapi.client.sheets.spreadsheets.values.get({
-            spreadsheetId: SHEET_ID,
-            range: SHEET_ACESSOS_RANGE
-        }).then(function(response) {
-            const emails = (response.result.values || []).flat().map(e => e.trim().toLowerCase());
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_ACESSOS_RANGE}`, {
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const emails = (data.values || []).flat().map(e => e.trim().toLowerCase());
             if (emails.includes(userEmail.toLowerCase())) {
                 showApp();
             } else {
                 document.getElementById('loginError').textContent = 'Acesso negado! Seu e-mail não está autorizado.';
                 hideApp();
             }
-        }, function(error) {
-            document.getElementById('loginError').textContent = 'Erro ao verificar acesso: ' + error.result.error.message;
-            hideApp();
         });
     }
 
@@ -788,4 +716,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     window.addEventListener('DOMContentLoaded', startLoginParticles);
+
+    // Salvar perfil ao submeter o formulário usando fetch + accessToken GIS
+    if (typeof perfilForm !== 'undefined' && perfilForm) {
+        perfilForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!accessToken) {
+                alert('Você precisa estar autenticado para salvar o perfil.');
+                return;
+            }
+            const profileData = [
+                perfilForm.perfilTelefone.value,
+                perfilForm.perfilEmail.value,
+                perfilForm.perfilId.value,
+                perfilForm.perfilSecretaria.value,
+                perfilForm.perfilSenha.value
+            ];
+            fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PERFIL!A1:append?valueInputOption=RAW`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ values: [profileData] })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.updates) {
+                    alert('Perfil salvo com sucesso na planilha Google!');
+                    closePerfilModal();
+                } else {
+                    alert('Erro ao salvar perfil: ' + (data.error && data.error.message ? data.error.message : 'Erro desconhecido'));
+                }
+            })
+            .catch(err => {
+                alert('Erro ao salvar perfil: ' + err.message);
+            });
+        });
+    }
 });
