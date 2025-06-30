@@ -611,6 +611,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }).requestAccessToken();
     }
 
+    function carregarPerfilUsuario() {
+        if (!accessToken || !userEmail) return;
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PERFIL!A1:Z1000`, {
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.values || !perfilForm) return;
+            const header = data.values[0].map(h => h.trim().toLowerCase());
+            const emailIdx = header.indexOf('email');
+            if (emailIdx === -1) return;
+            const userRow = data.values.find((row, idx) => idx > 0 && row[emailIdx] && row[emailIdx].toLowerCase() === userEmail.toLowerCase());
+            if (userRow) {
+                // Preencher campos conforme o cabeçalho
+                const getVal = (col) => {
+                    const idx = header.indexOf(col);
+                    return idx !== -1 ? (userRow[idx] || '') : '';
+                };
+                perfilForm.perfilTelefone.value = getVal('telefone');
+                perfilForm.perfilEmail.value = getVal('email');
+                perfilForm.perfilId.value = getVal('id');
+                perfilForm.perfilSecretaria.value = getVal('secretaria');
+                // Não preencher senha por segurança
+            }
+        });
+    }
+
     function checkUserAccess() {
         fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_ACESSOS_RANGE}`, {
             headers: {
@@ -622,6 +651,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const emails = (data.values || []).flat().map(e => e.trim().toLowerCase());
             if (emails.includes(userEmail.toLowerCase())) {
                 showApp();
+                carregarPerfilUsuario(); // Carrega dados do perfil ao logar
             } else {
                 document.getElementById('loginError').textContent = 'Acesso negado! Seu e-mail não está autorizado.';
                 hideApp();
