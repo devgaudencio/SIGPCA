@@ -576,10 +576,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Chama handleClientLoad ao carregar a página
-    window.addEventListener('load', function() {
-        if (window.gapi) handleClientLoad();
-    });
+    // Chama handleClientLoad ao carregar a página, aguardando o gapi estar disponível
+    function waitForGapiAndInit() {
+        if (window.gapi && window.gapi.load) {
+            handleClientLoad();
+        } else {
+            setTimeout(waitForGapiAndInit, 100);
+        }
+    }
+    window.addEventListener('load', waitForGapiAndInit);
 
     function signInAndSaveProfile(profileData, onSuccess, onError) {
         gapi.auth2.getAuthInstance().signIn().then(() => {
