@@ -86,14 +86,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Função de logout
-    logoutBtn.addEventListener('click', function() {
-        if (confirm('Tem certeza que deseja sair do sistema?')) {
-            // Aqui você pode adicionar lógica de logout
-            alert('Logout realizado com sucesso!');
-            // Redirecionar para página de login ou recarregar a página
-            // window.location.href = 'login.html';
-        }
-    });
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            auth.signOut().then(() => {
+                hideApp();
+            });
+        });
+    }
 
     // Função para notificações
     notificationBtn.addEventListener('click', function() {
@@ -590,11 +589,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Detecta login automático
+    const ADMIN_EMAIL = 'gaudencio2006souza@gmail.com';
+
+    function addAdminMenuIfNeeded(user) {
+        if (!user || user.email !== ADMIN_EMAIL) return;
+        const sidebarMenu = document.querySelector('.sidebar-menu');
+        if (!sidebarMenu || document.getElementById('adminMenuItem')) return;
+        const li = document.createElement('li');
+        li.className = 'menu-item';
+        li.id = 'adminMenuItem';
+        li.innerHTML = '<i class="fas fa-user-shield"></i><span>Administrador</span>';
+        li.onclick = () => { window.location.href = 'admin.html'; };
+        sidebarMenu.appendChild(li);
+    }
+
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             showApp();
             carregarPerfil(user);
             listarItensDoUsuario(user);
+            addAdminMenuIfNeeded(user);
         } else {
             hideApp();
         }
