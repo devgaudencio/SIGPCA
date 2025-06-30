@@ -569,10 +569,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function showApp() {
         document.getElementById('login').style.display = 'none';
         document.getElementById('app').style.display = '';
+        document.getElementById('login-bg-anim').style.display = 'none'; // Oculta fundo animado
     }
     function hideApp() {
         document.getElementById('login').style.display = '';
         document.getElementById('app').style.display = 'none';
+        document.getElementById('login-bg-anim').style.display = ''; // Mostra fundo animado
     }
 
     window.onload = function() {
