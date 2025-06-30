@@ -8,284 +8,300 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <!-- Menu Lateral -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <h2><i class="fas fa-building"></i> SIGPCA</h2>
-                <p>Sistema de Contratações</p>
+    <div id="login-bg-anim">
+        <canvas id="loginParticles"></canvas>
+    </div>
+    <div id="login" class="login-container">
+        <div class="login-content">
+            <h1 class="login-title">SIGPCA</h1>
+            <p class="login-subtitle">Sistema Integrado de Gestão de Contratações Públicas</p>
+            <div id="gSignInWrapper"></div>
+            <div class="login-register-text">
+                Não tem uma conta? <a href="https://www.instagram.com/gaudencio.dev/" target="_blank" class="register-link">Cadastrar</a>
             </div>
-            
-            <ul class="sidebar-menu">
-                <li class="menu-item active" data-section="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </li>
-                <li class="menu-item" data-section="cadastro">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Cadastro</span>
-                </li>
-                <li class="menu-item" data-section="notificacoes">
-                    <i class="fas fa-bell"></i>
-                    <span>Notificações</span>
-                </li>
-                <li class="menu-item" data-section="configuracoes">
-                    <i class="fas fa-cog"></i>
-                    <span>Configurações</span>
-                </li>
-                <li class="menu-item" data-section="academy">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>SIGPCAAcademy</span>
-                </li>
-            </ul>
-            
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Usuário</span>
+            <div id="loginError" style="color: #e74c3c; margin-top: 1rem;"></div>
+        </div>
+    </div>
+    <div id="app" style="display:none;">
+        <div class="container">
+            <!-- Menu Lateral -->
+            <nav class="sidebar">
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-building"></i> SIGPCA</h2>
+                    <p>Sistema de Contratações</p>
                 </div>
-                <button class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Sair</span>
-                </button>
-            </div>
-        </nav>
-
-        <!-- Conteúdo Principal -->
-        <main class="main-content">
-            <header class="top-header">
-                <button class="menu-toggle" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="header-title">
-                    <h1 id="pageTitle">Dashboard</h1>
-                </div>
-                <div class="header-actions">
-                    <button class="notification-btn">
+                
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="menu-item" data-section="cadastro">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Cadastro</span>
+                    </li>
+                    <li class="menu-item" data-section="notificacoes">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
-                    <button class="profile-btn">
-                        <i class="fas fa-user"></i>
+                        <span>Notificações</span>
+                    </li>
+                    <li class="menu-item" data-section="configuracoes">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </li>
+                    <li class="menu-item" data-section="academy">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>SIGPCAAcademy</span>
+                    </li>
+                </ul>
+                
+                <div class="sidebar-footer">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Usuário</span>
+                    </div>
+                    <button class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
                     </button>
                 </div>
-            </header>
+            </nav>
 
-            <div class="content-area">
-                <!-- Dashboard Section -->
-                <section id="dashboard" class="content-section active">
-                    <div class="dashboard-grid">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-file-contract"></i>
-                                <h3>Contratos Ativos</h3>
-                            </div>
-                            <div class="card-content">
-                                <span class="number">24</span>
-                                <span class="label">Contratos</span>
-                            </div>
-                        </div>
-                        
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-clock"></i>
-                                <h3>Em Andamento</h3>
-                            </div>
-                            <div class="card-content">
-                                <span class="number">8</span>
-                                <span class="label">Processos</span>
-                            </div>
-                        </div>
-                        
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-check-circle"></i>
-                                <h3>Concluídos</h3>
-                            </div>
-                            <div class="card-content">
-                                <span class="number">156</span>
-                                <span class="label">Este Ano</span>
-                            </div>
-                        </div>
-                        
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <h3>Pendentes</h3>
-                            </div>
-                            <div class="card-content">
-                                <span class="number">12</span>
-                                <span class="label">Ações</span>
-                            </div>
-                        </div>
+            <!-- Conteúdo Principal -->
+            <main class="main-content">
+                <header class="top-header">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="header-title">
+                        <h1 id="pageTitle">Dashboard</h1>
                     </div>
-                    
-                    <div class="dashboard-charts">
-                        <div class="chart-card">
-                            <h3>Atividade Recente</h3>
-                            <div class="activity-list">
-                                <div class="activity-item">
-                                    <i class="fas fa-plus text-success"></i>
-                                    <div class="activity-content">
-                                        <p>Novo contrato cadastrado</p>
-                                        <small>Há 2 horas</small>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <i class="fas fa-edit text-warning"></i>
-                                    <div class="activity-content">
-                                        <p>Contrato atualizado</p>
-                                        <small>Há 4 horas</small>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <i class="fas fa-check text-success"></i>
-                                    <div class="activity-content">
-                                        <p>Processo concluído</p>
-                                        <small>Há 1 dia</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Cadastro Section -->
-                <section id="cadastro" class="content-section">
-                    <div class="section-header">
-                        <div class="search-bar">
-                            <input type="text" id="itemSearchInput" placeholder="Pesquisar itens..." autocomplete="off">
-                            <button class="filter-btn" id="itemFilterBtn" title="Filtros avançados (em breve)"><i class="fas fa-filter"></i></button>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="btn-secondary" id="importBtn">
-                                <i class="fas fa-file-import"></i>
-                                Importar
-                            </button>
-                            <button class="btn-primary">
-                                <i class="fas fa-plus"></i>
-                                Novo Item
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Tabela de Itens Cadastrados -->
-                    <div class="table-container" id="itensTableContainer">
-                        <table class="itens-table">
-                            <thead>
-                                <tr>
-                                    <th>Nº Item</th>
-                                    <th>Classificação</th>
-                                    <th>Descrição</th>
-                                    <th>Unidade</th>
-                                    <th>Quantitativo</th>
-                                    <th>Valor Unitário</th>
-                                    <th>Valor Total</th>
-                                    <th>Fonte de Recurso</th>
-                                    <th>Programa</th>
-                                    <th>Prioridade</th>
-                                    <th>Forma da Contratação</th>
-                                    <th>Início</th>
-                                    <th>Fim</th>
-                                    <th>Justificativa</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="itensTableBody">
-                                <tr class="no-items-row"><td colspan="15" style="text-align:center;color:#aaa;">Nenhum item cadastrado</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <!-- Notificações Section -->
-                <section id="notificacoes" class="content-section">
-                    <div class="section-header">
-                        <h2>Notificações</h2>
-                        <button class="btn-secondary">
-                            <i class="fas fa-check-double"></i>
-                            Marcar como Lidas
+                    <div class="header-actions">
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <button class="profile-btn">
+                            <i class="fas fa-user"></i>
                         </button>
                     </div>
-                    <div class="placeholder-content">
-                        <i class="fas fa-bell"></i>
-                        <h3>Central de Notificações</h3>
-                        <p>Suas notificações aparecerão aqui.</p>
-                    </div>
-                </section>
+                </header>
 
-                <!-- Configurações Section -->
-                <section id="configuracoes" class="content-section">
-                    <div class="config-options">
-                        <div class="config-card" id="perfilSegurancaBtn">
-                            <i class="fas fa-user-shield"></i>
-                            <span>Perfil e Segurança</span>
-                        </div>
-                        <div class="config-card">
-                            <i class="fas fa-sliders-h"></i>
-                            <span>Ajustes e Sistema</span>
-                        </div>
-                        <div class="config-card">
-                            <i class="fas fa-network-wired"></i>
-                            <span>Rede e Logs</span>
-                        </div>
-                    </div>
-
-                    <!-- Modal Perfil e Segurança -->
-                    <div class="modal-overlay" id="perfilModalOverlay">
-                        <div class="modal perfil-modal" id="perfilModal">
-                            <div class="modal-header">
-                                <h2>Perfil e Segurança</h2>
-                                <button class="close-modal" id="closePerfilModal" title="Fechar">&times;</button>
+                <div class="content-area">
+                    <!-- Dashboard Section -->
+                    <section id="dashboard" class="content-section active">
+                        <div class="dashboard-grid">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-file-contract"></i>
+                                    <h3>Contratos Ativos</h3>
+                                </div>
+                                <div class="card-content">
+                                    <span class="number">24</span>
+                                    <span class="label">Contratos</span>
+                                </div>
                             </div>
-                            <form id="perfilForm">
-                                <div class="perfil-info-row">
-                                    <div class="form-group">
-                                        <label for="perfilTelefone">Telefone</label>
-                                        <input type="text" id="perfilTelefone" name="perfilTelefone" placeholder="(00) 00000-0000">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="perfilEmail">Email</label>
-                                        <input type="email" id="perfilEmail" name="perfilEmail" placeholder="email@exemplo.com">
-                                    </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-clock"></i>
+                                    <h3>Em Andamento</h3>
                                 </div>
-                                <div class="perfil-info-row">
-                                    <div class="form-group">
-                                        <label for="perfilId">ID</label>
-                                        <input type="text" id="perfilId" name="perfilId" value="" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="perfilSecretaria">Secretaria</label>
-                                        <input type="text" id="perfilSecretaria" name="perfilSecretaria" value="" readonly>
-                                    </div>
+                                <div class="card-content">
+                                    <span class="number">8</span>
+                                    <span class="label">Processos</span>
                                 </div>
-                                <div class="perfil-info-row">
-                                    <div class="form-group full-width">
-                                        <label for="perfilSenha">Alterar Senha</label>
-                                        <input type="password" id="perfilSenha" name="perfilSenha" placeholder="Nova senha">
-                                    </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-check-circle"></i>
+                                    <h3>Concluídos</h3>
                                 </div>
-                                <div class="modal-actions">
-                                    <button type="submit" class="btn-primary">Salvar</button>
-                                    <button type="button" class="btn-secondary" id="cancelPerfilModal">Cancelar</button>
+                                <div class="card-content">
+                                    <span class="number">156</span>
+                                    <span class="label">Este Ano</span>
                                 </div>
-                            </form>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <h3>Pendentes</h3>
+                                </div>
+                                <div class="card-content">
+                                    <span class="number">12</span>
+                                    <span class="label">Ações</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </section>
+                        
+                        <div class="dashboard-charts">
+                            <div class="chart-card">
+                                <h3>Atividade Recente</h3>
+                                <div class="activity-list">
+                                    <div class="activity-item">
+                                        <i class="fas fa-plus text-success"></i>
+                                        <div class="activity-content">
+                                            <p>Novo contrato cadastrado</p>
+                                            <small>Há 2 horas</small>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <i class="fas fa-edit text-warning"></i>
+                                        <div class="activity-content">
+                                            <p>Contrato atualizado</p>
+                                            <small>Há 4 horas</small>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <i class="fas fa-check text-success"></i>
+                                        <div class="activity-content">
+                                            <p>Processo concluído</p>
+                                            <small>Há 1 dia</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
 
-                <!-- Academy Section -->
-                <section id="academy" class="content-section">
-                    <div class="section-header">
-                        <h2>SIGPCAAcademy</h2>
-                    </div>
-                    <div class="placeholder-content">
-                        <i class="fas fa-graduation-cap"></i>
-                        <h3>Portal de Treinamento</h3>
-                        <p>Acesse cursos e materiais de treinamento.</p>
-                    </div>
-                </section>
-            </div>
-        </main>
+                    <!-- Cadastro Section -->
+                    <section id="cadastro" class="content-section">
+                        <div class="section-header">
+                            <div class="search-bar">
+                                <input type="text" id="itemSearchInput" placeholder="Pesquisar itens..." autocomplete="off">
+                                <button class="filter-btn" id="itemFilterBtn" title="Filtros avançados (em breve)"><i class="fas fa-filter"></i></button>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn-secondary" id="importBtn">
+                                    <i class="fas fa-file-import"></i>
+                                    Importar
+                                </button>
+                                <button class="btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Novo Item
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Tabela de Itens Cadastrados -->
+                        <div class="table-container" id="itensTableContainer">
+                            <table class="itens-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nº Item</th>
+                                        <th>Classificação</th>
+                                        <th>Descrição</th>
+                                        <th>Unidade</th>
+                                        <th>Quantitativo</th>
+                                        <th>Valor Unitário</th>
+                                        <th>Valor Total</th>
+                                        <th>Fonte de Recurso</th>
+                                        <th>Programa</th>
+                                        <th>Prioridade</th>
+                                        <th>Forma da Contratação</th>
+                                        <th>Início</th>
+                                        <th>Fim</th>
+                                        <th>Justificativa</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itensTableBody">
+                                    <tr class="no-items-row"><td colspan="15" style="text-align:center;color:#aaa;">Nenhum item cadastrado</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Notificações Section -->
+                    <section id="notificacoes" class="content-section">
+                        <div class="section-header">
+                            <h2>Notificações</h2>
+                            <button class="btn-secondary">
+                                <i class="fas fa-check-double"></i>
+                                Marcar como Lidas
+                            </button>
+                        </div>
+                        <div class="placeholder-content">
+                            <i class="fas fa-bell"></i>
+                            <h3>Central de Notificações</h3>
+                            <p>Suas notificações aparecerão aqui.</p>
+                        </div>
+                    </section>
+
+                    <!-- Configurações Section -->
+                    <section id="configuracoes" class="content-section">
+                        <div class="config-options">
+                            <div class="config-card" id="perfilSegurancaBtn">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Perfil e Segurança</span>
+                            </div>
+                            <div class="config-card">
+                                <i class="fas fa-sliders-h"></i>
+                                <span>Ajustes e Sistema</span>
+                            </div>
+                            <div class="config-card">
+                                <i class="fas fa-network-wired"></i>
+                                <span>Rede e Logs</span>
+                            </div>
+                        </div>
+
+                        <!-- Modal Perfil e Segurança -->
+                        <div class="modal-overlay" id="perfilModalOverlay">
+                            <div class="modal perfil-modal" id="perfilModal">
+                                <div class="modal-header">
+                                    <h2>Perfil e Segurança</h2>
+                                    <button class="close-modal" id="closePerfilModal" title="Fechar">&times;</button>
+                                </div>
+                                <form id="perfilForm">
+                                    <div class="perfil-info-row">
+                                        <div class="form-group">
+                                            <label for="perfilTelefone">Telefone</label>
+                                            <input type="text" id="perfilTelefone" name="perfilTelefone" placeholder="(00) 00000-0000">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="perfilEmail">Email</label>
+                                            <input type="email" id="perfilEmail" name="perfilEmail" placeholder="email@exemplo.com">
+                                        </div>
+                                    </div>
+                                    <div class="perfil-info-row">
+                                        <div class="form-group">
+                                            <label for="perfilId">ID</label>
+                                            <input type="text" id="perfilId" name="perfilId" value="" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="perfilSecretaria">Secretaria</label>
+                                            <input type="text" id="perfilSecretaria" name="perfilSecretaria" value="" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="perfil-info-row">
+                                        <div class="form-group full-width">
+                                            <label for="perfilSenha">Alterar Senha</label>
+                                            <input type="password" id="perfilSenha" name="perfilSenha" placeholder="Nova senha">
+                                        </div>
+                                    </div>
+                                    <div class="modal-actions">
+                                        <button type="submit" class="btn-primary">Salvar</button>
+                                        <button type="button" class="btn-secondary" id="cancelPerfilModal">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Academy Section -->
+                    <section id="academy" class="content-section">
+                        <div class="section-header">
+                            <h2>SIGPCAAcademy</h2>
+                        </div>
+                        <div class="placeholder-content">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h3>Portal de Treinamento</h3>
+                            <p>Acesse cursos e materiais de treinamento.</p>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
     </div>
 
     <!-- Modal de Cadastro de Item -->
@@ -411,7 +427,12 @@
         </div>
     </div>
 
+    <footer class="main-footer">
+        SIGPCA - <a href="https://www.instagram.com/gaudencio.dev/" target="_blank" class="footer-link">@Gaudencio.dev</a>
+    </footer>
+
     <script src="home.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js"></script>
 </body>
 </html>
