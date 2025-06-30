@@ -558,4 +558,76 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // === GOOGLE SHEETS INTEGRAÇÃO PERFIL ===
+    const CLIENT_ID = '165495776336-46sf063kpq4hr9udih5ln760luuu3m0m.apps.googleusercontent.com';
+    const SHEET_ID = '1PLm-xHvgAOjhRe1Y4CIKYa1rYxTryUE3USpBs3ZGw84';
+    const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+
+    function handleClientLoad() {
+        gapi.load('client:auth2', initClient);
+    }
+
+    function initClient() {
+        gapi.client.init({
+            clientId: CLIENT_ID,
+            discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+            scope: SCOPES
+        });
+    }
+
+    // Chama handleClientLoad ao carregar a página
+    window.addEventListener('load', function() {
+        if (window.gapi) handleClientLoad();
+    });
+
+    function signInAndSaveProfile(profileData, onSuccess, onError) {
+        gapi.auth2.getAuthInstance().signIn().then(() => {
+            gapi.client.sheets.spreadsheets.values.append({
+                spreadsheetId: SHEET_ID,
+                range: "PERFIL!A1",
+                valueInputOption: "RAW",
+                insertDataOption: "INSERT_ROWS",
+                resource: {
+                    values: [
+                        [
+                            profileData.telefone,
+                            profileData.email,
+                            profileData.id,
+                            profileData.secretaria,
+                            profileData.senha
+                        ]
+                    ]
+                }
+            }).then(response => {
+                if (onSuccess) onSuccess(response);
+            }, error => {
+                if (onError) onError(error);
+            });
+        });
+    }
+
+    // Salvar perfil ao submeter o formulário
+    if (perfilForm) {
+        perfilForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const profileData = {
+                telefone: perfilForm.perfilTelefone.value,
+                email: perfilForm.perfilEmail.value,
+                id: perfilForm.perfilId.value,
+                secretaria: perfilForm.perfilSecretaria.value,
+                senha: perfilForm.perfilSenha.value
+            };
+            if (window.gapi && gapi.auth2) {
+                signInAndSaveProfile(profileData, function() {
+                    alert('Perfil salvo com sucesso na planilha Google!');
+                    closePerfilModal();
+                }, function(error) {
+                    alert('Erro ao salvar perfil: ' + error.result.error.message);
+                });
+            } else {
+                alert('Google API não carregada. Tente recarregar a página.');
+            }
+        });
+    }
 });
