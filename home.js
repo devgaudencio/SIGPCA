@@ -635,4 +635,157 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // === LOGIN GOOGLE E AUTORIZAÇÃO ===
+    const SHEET_ACESSOS_RANGE = 'ACESSOS!A:A';
+    let userEmail = null;
+    let gapiReady = false;
+
+    function showApp() {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('app').style.display = '';
+    }
+    function hideApp() {
+        document.getElementById('login').style.display = '';
+        document.getElementById('app').style.display = 'none';
+    }
+
+    function onGoogleSignIn(response) {
+        // Decodifica o JWT do Google Identity Services
+        const idToken = response.credential;
+        const payload = JSON.parse(atob(idToken.split('.')[1]));
+        userEmail = payload.email;
+        // Após login, inicializa gapi e verifica acesso
+        waitForGapiAndInit();
+        checkUserAccess();
+    }
+
+    function renderGoogleSignIn() {
+        if (window.google && window.google.accounts && window.google.accounts.id) {
+            window.google.accounts.id.initialize({
+                client_id: CLIENT_ID,
+                callback: onGoogleSignIn
+            });
+            window.google.accounts.id.renderButton(
+                document.getElementById('gSignInWrapper'),
+                { theme: 'outline', size: 'large' }
+            );
+        } else {
+            setTimeout(renderGoogleSignIn, 100);
+        }
+    }
+    window.addEventListener('DOMContentLoaded', renderGoogleSignIn);
+
+    function checkUserAccess() {
+        if (!userEmail || !gapiReady) {
+            setTimeout(checkUserAccess, 200);
+            return;
+        }
+        // Lê a lista de e-mails autorizados da aba ACESSOS
+        gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: SHEET_ID,
+            range: SHEET_ACESSOS_RANGE
+        }).then(function(response) {
+            const emails = (response.result.values || []).flat().map(e => e.trim().toLowerCase());
+            if (emails.includes(userEmail.toLowerCase())) {
+                showApp();
+            } else {
+                document.getElementById('loginError').textContent = 'Acesso negado! Seu e-mail não está autorizado.';
+                hideApp();
+            }
+        }, function(error) {
+            document.getElementById('loginError').textContent = 'Erro ao verificar acesso: ' + error.result.error.message;
+            hideApp();
+        });
+    }
+
+    // === EFEITO DE PARTÍCULAS NA TELA DE LOGIN ===
+    function startLoginParticles() {
+        const canvas = document.getElementById('loginParticles');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let w = window.innerWidth;
+        let h = window.innerHeight;
+        canvas.width = w;
+        canvas.height = h;
+
+        let particles = [];
+        const PARTICLE_COUNT = Math.floor((w * h) / 3500);
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            particles.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: 1.2 + Math.random() * 2.2,
+                dx: (Math.random() - 0.5) * 0.7,
+                dy: (Math.random() - 0.5) * 0.7
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            // Desenha partículas
+            for (let p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(102,126,234,0.7)';
+                ctx.shadowColor = '#764ba2';
+                ctx.shadowBlur = 8;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            // Linhas entre partículas próximas
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    let a = particles[i];
+                    let b = particles[j];
+                    let dist = Math.hypot(a.x - b.x, a.y - b.y);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.strokeStyle = 'rgba(102,126,234,' + (0.15 - dist / 800) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function update() {
+            for (let p of particles) {
+                p.x += p.dx;
+                p.y += p.dy;
+                if (p.x < 0 || p.x > w) p.dx *= -1;
+                if (p.y < 0 || p.y > h) p.dy *= -1;
+            }
+        }
+
+        function loop() {
+            draw();
+            update();
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        // Responsivo
+        window.addEventListener('resize', () => {
+            w = window.innerWidth;
+            h = window.innerHeight;
+            canvas.width = w;
+            canvas.height = h;
+            // Recria partículas para novo tamanho
+            particles = [];
+            const NEW_COUNT = Math.floor((w * h) / 3500);
+            for (let i = 0; i < NEW_COUNT; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    r: 1.2 + Math.random() * 2.2,
+                    dx: (Math.random() - 0.5) * 0.7,
+                    dy: (Math.random() - 0.5) * 0.7
+                });
+            }
+        });
+    }
+    window.addEventListener('DOMContentLoaded', startLoginParticles);
 });
