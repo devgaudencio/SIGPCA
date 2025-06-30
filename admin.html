@@ -38,29 +38,97 @@
     </style>
 </head>
 <body style="background: #f5f7fa;">
-  <div class="admin-container">
-    <div class="admin-title">Painel do Administrador</div>
-    <form class="admin-form" id="acessoForm">
-      <input type="email" id="acessoEmail" placeholder="E-mail do usuário" required>
-      <input type="password" id="acessoSenha" placeholder="Senha (opcional)">
-      <input type="text" id="acessoSecretaria" placeholder="Secretaria" required>
-      <button type="submit">Cadastrar Acesso</button>
-    </form>
-    <div class="acessos-list">
-      <h3>Acessos cadastrados</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>E-mail</th>
-            <th>Secretaria</th>
-          </tr>
-        </thead>
-        <tbody id="acessosTableBody">
-          <tr><td colspan="2" style="color:#aaa;text-align:center;">Carregando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <button class="logout-btn" id="logoutAdminBtn">Sair</button>
+  <div class="container">
+    <!-- Menu Lateral -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-building"></i> SIGPCA</h2>
+        <p>Sistema de Contratações</p>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item" onclick="window.location.href='index.html'">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </li>
+        <li class="menu-item" onclick="window.location.href='cadastro.html'">
+          <i class="fas fa-plus-circle"></i>
+          <span>Cadastro</span>
+        </li>
+        <li class="menu-item" onclick="window.location.href='notificacoes.html'">
+          <i class="fas fa-bell"></i>
+          <span>Notificações</span>
+        </li>
+        <li class="menu-item" onclick="window.location.href='configuracoes.html'">
+          <i class="fas fa-cog"></i>
+          <span>Configurações</span>
+        </li>
+        <li class="menu-item" onclick="window.location.href='academy.html'">
+          <i class="fas fa-graduation-cap"></i>
+          <span>SIGPCAAcademy</span>
+        </li>
+        <li class="menu-item active">
+          <i class="fas fa-user-shield"></i>
+          <span>Administrador</span>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <i class="fas fa-user-circle"></i>
+          <span id="sidebarUser">Administrador</span>
+        </div>
+        <button class="logout-btn" id="logoutAdminBtn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+    </nav>
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      <header class="top-header">
+        <button class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="header-title">
+          <h1 id="pageTitle">Painel do Administrador</h1>
+        </div>
+        <div class="header-actions">
+          <button class="notification-btn" onclick="window.location.href='notificacoes.html'">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <button class="profile-btn" onclick="window.location.href='configuracoes.html'">
+            <i class="fas fa-user"></i>
+          </button>
+        </div>
+      </header>
+      <div class="content-area">
+        <section class="content-section active">
+          <div class="admin-container">
+            <div class="admin-title">Painel do Administrador</div>
+            <form class="admin-form" id="acessoForm">
+              <input type="email" id="acessoEmail" placeholder="E-mail do usuário" required>
+              <input type="password" id="acessoSenha" placeholder="Senha (opcional)">
+              <input type="text" id="acessoSecretaria" placeholder="Secretaria" required>
+              <button type="submit">Cadastrar Acesso</button>
+            </form>
+            <div class="acessos-list">
+              <h3>Acessos cadastrados</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>E-mail</th>
+                    <th>Secretaria</th>
+                  </tr>
+                </thead>
+                <tbody id="acessosTableBody">
+                  <tr><td colspan="2" style="color:#aaa;text-align:center;">Carregando...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
   </div>
   <script>
     // Só permite acesso ao admin
@@ -82,6 +150,10 @@
       const senha = document.getElementById('acessoSenha').value;
       const secretaria = document.getElementById('acessoSecretaria').value.trim();
       if (!email || !secretaria) return alert('Preencha todos os campos obrigatórios!');
+      if (senha && senha.length < 6) {
+        alert('A senha deve ter pelo menos 6 caracteres.');
+        return;
+      }
       // Cria usuário no Auth se senha for informada
       if (senha) {
         auth.createUserWithEmailAndPassword(email, senha)
@@ -128,5 +200,6 @@
       });
     };
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 </html> 
