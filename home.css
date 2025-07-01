@@ -97,9 +97,9 @@ body {
 .logout-btn {
     width: 100%;
     padding: 0.75rem;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: white;
+    background: #E74C3C !important;
+    border: none;
+    color: white !important;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -110,7 +110,8 @@ body {
 }
 
 .logout-btn:hover {
-    background: rgba(255,255,255,0.2);
+    background: #c0392b !important;
+    color: white !important;
 }
 
 /* Conteúdo Principal */
