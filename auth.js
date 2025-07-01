@@ -34,10 +34,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const app = document.getElementById('app');
     if (app) app.style.display = 'none';
 
+    const path = window.location.pathname.split('/').pop();
+
     if (!user) {
-      if (!window.location.pathname.endsWith('index.html')) {
+      // Se não autenticado e não está na tela de login, redireciona para index.html
+      if (path !== 'index.html') {
         window.location.href = 'index.html';
       }
+      return;
+    }
+
+    // Se autenticado e não está no dashboard, redireciona para dashboard.html
+    if (user && path === 'index.html') {
+      window.location.href = 'dashboard.html';
       return;
     }
 
@@ -60,14 +69,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Protege admin.html para não-admins
-    if (window.location.pathname.endsWith('admin.html') && user.email !== ADMIN_EMAIL) {
+    if (path === 'admin.html' && user.email !== ADMIN_EMAIL) {
       alert('Acesso negado. Apenas administradores podem acessar esta página.');
       window.location.href = 'index.html';
       return;
     }
 
     // Destaque dinâmico do item ativo
-    const path = window.location.pathname.split('/').pop();
     document.querySelectorAll('.sidebar-menu .menu-item').forEach(link => {
       link.classList.remove('active');
       if (link.getAttribute('href') === path) {

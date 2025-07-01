@@ -1199,3 +1199,15 @@ body.cadastro-modal-open .modal {
         padding: 0.5rem 0;
     }
 }
+
+.sidebar-menu .menu-item,
+.sidebar-menu .menu-item i,
+.sidebar-menu .menu-item span {
+    color: #fff !important;
+}
+
+.sidebar-menu .menu-item.active,
+.sidebar-menu .menu-item.active i,
+.sidebar-menu .menu-item.active span {
+    color: #fff !important;
+}

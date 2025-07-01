@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="auth.js"></script>
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyDBt9_pG-9uNyMEeMq4UnRDV7EjQSjV_o0",
@@ -19,10 +18,11 @@
         appId: "1:528402082133:web:a3f9691545858de44b67dc",
         measurementId: "G-8RC4CP7RZ2"
       };
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const db = firebase.firestore();
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
     </script>
+    <script src="auth.js"></script>
 </head>
 <body>
     <div class="container">
@@ -72,8 +72,6 @@
             <div class="content-area">
                 <!-- Cadastro Section -->
                 <section id="cadastro" class="content-section active">
-                    <!-- Aqui vai o conteúdo do cadastro de itens -->
-                    <!-- Você pode copiar o conteúdo da seção de cadastro do index.html -->
                     <div class="section-header">
                         <div class="search-bar">
                             <input type="text" id="itemSearchInput" placeholder="Pesquisar itens..." autocomplete="off">
@@ -116,8 +114,19 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- Modal de cadastro de item (pode ser copiado do index.html) -->
-                    <!-- ... -->
+                    <!-- Modal de cadastro de item -->
+                    <div class="modal-overlay" id="itemModalOverlay" style="display:none;">
+                        <div class="modal" id="itemModal">
+                            <div class="modal-header">
+                                <h2>Cadastro de Item</h2>
+                                <button class="close-modal" id="closeItemModal" title="Fechar">&times;</button>
+                            </div>
+                            <form id="itemForm">
+                                <!-- Campos do formulário de item -->
+                                <!-- ... (copiar do index se necessário) ... -->
+                            </form>
+                        </div>
+                    </div>
                 </section>
             </div>
         </main>

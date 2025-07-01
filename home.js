@@ -89,8 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função de logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function() {
-            auth.signOut().then(() => {
-                hideApp();
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'index.html';
             });
         });
     }
