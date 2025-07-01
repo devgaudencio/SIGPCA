@@ -401,7 +401,26 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebarMenu.appendChild(li);
     }
 
+    // Adiciona um loading visual
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'loadingAuth';
+    loadingDiv.style.position = 'fixed';
+    loadingDiv.style.top = '0';
+    loadingDiv.style.left = '0';
+    loadingDiv.style.width = '100vw';
+    loadingDiv.style.height = '100vh';
+    loadingDiv.style.background = 'rgba(255,255,255,0.85)';
+    loadingDiv.style.display = 'flex';
+    loadingDiv.style.alignItems = 'center';
+    loadingDiv.style.justifyContent = 'center';
+    loadingDiv.style.zIndex = '9999';
+    loadingDiv.innerHTML = '<div style="font-size:2rem;color:#667eea;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
+    document.body.appendChild(loadingDiv);
+
     firebase.auth().onAuthStateChanged(user => {
+        // Remove o loading
+        const loading = document.getElementById('loadingAuth');
+        if (loading) loading.remove();
         if (!user) {
             if (!window.location.pathname.endsWith('index.html')) {
                 window.location.href = 'index.html';
