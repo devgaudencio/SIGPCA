@@ -31,7 +31,12 @@ document.addEventListener('DOMContentLoaded', function() {
             adminLink.innerHTML = '<i class="fas fa-user-shield"></i><span>Administrador</span>';
             sidebarMenu.appendChild(adminLink);
         }
+        inicializarModaisEBotoes();
     });
+
+    function inicializarModaisEBotoes() {
+        // Adicione aqui listeners de botões/modais se necessário
+    }
 
   if (window.location.pathname.includes('admin.html')) {
     // Adicione aqui apenas o código real do painel admin.

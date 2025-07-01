@@ -25,7 +25,20 @@ document.addEventListener('DOMContentLoaded', function() {
             adminLink.innerHTML = '<i class="fas fa-user-shield"></i><span>Administrador</span>';
             sidebarMenu.appendChild(adminLink);
         }
+        inicializarModaisEBotoes();
     });
+
+    function inicializarModaisEBotoes() {
+        const perfilBtn = document.querySelector('.profile-btn');
+        if (perfilBtn) {
+            perfilBtn.addEventListener('click', function() {
+                // Aqui você pode abrir o modal de perfil se existir
+                // ou navegar para a seção de perfil
+                // Exemplo: abrir modal ou mostrar seção de perfil
+                // document.getElementById('perfilModal').classList.add('active');
+            });
+        }
+    }
 
   if (document.getElementById('configuracoes') || document.getElementById('perfilForm')) {
     // Adicione aqui apenas o código real de perfil/configurações.

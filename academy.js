@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', function() {
             adminLink.innerHTML = '<i class="fas fa-user-shield"></i><span>Administrador</span>';
             sidebarMenu.appendChild(adminLink);
         }
+        inicializarModaisEBotoes();
     });
   }
-}); 
+});
+
+function inicializarModaisEBotoes() {
+  // Adicione aqui listeners de botões/modais se necessário
+} 
