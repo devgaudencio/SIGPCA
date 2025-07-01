@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGPCAAcademy - SIGPCA</title>
     <link rel="stylesheet" href="home.css">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
       const firebaseConfig = {
+        // Substitua pelos seus dados reais do Firebase
         apiKey: "AIzaSyDBt9_pG-9uNyMEeMq4UnRDV7EjQSjV_o0",
         authDomain: "sigpca-afac4.firebaseapp.com",
         projectId: "sigpca-afac4",
@@ -18,10 +19,12 @@
         appId: "1:528402082133:web:a3f9691545858de44b67dc",
         measurementId: "G-8RC4CP7RZ2"
       };
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const db = firebase.firestore();
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
     </script>
+    <script src="auth.js"></script>
+    <script src="academy.js"></script>
 </head>
 <body>
     <div class="container">

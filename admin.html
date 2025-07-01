@@ -5,23 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Administrador - SIGPCA</title>
     <link rel="stylesheet" href="home.css">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyDBt9_pG-9uNyMEeMq4UnRDV7EjQSjV_o0",
-        authDomain: "sigpca-afac4.firebaseapp.com",
-        projectId: "sigpca-afac4",
-        storageBucket: "sigpca-afac4.appspot.com",
-        messagingSenderId: "528402082133",
-        appId: "1:528402082133:web:a3f9691545858de44b67dc",
-        measurementId: "G-8RC4CP7RZ2"
-      };
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const db = firebase.firestore();
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="auth.js"></script>
     <style>
       .admin-container { max-width: 600px; margin: 3rem auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px #667eea22; padding: 2.5rem 2rem; }
       .admin-title { font-size: 2rem; color: #667eea; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
@@ -115,7 +102,7 @@
   <script>
     // Só permite acesso ao admin
     const ADMIN_EMAIL = 'gaudencio2006souza@gmail.com';
-    auth.onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(user => {
       if (!user || user.email !== ADMIN_EMAIL) {
         alert('Acesso restrito ao administrador!');
         window.location.href = 'index.html';
@@ -138,7 +125,7 @@
       }
       // Cria usuário no Auth se senha for informada
       if (senha) {
-        auth.createUserWithEmailAndPassword(email, senha)
+        firebase.auth().createUserWithEmailAndPassword(email, senha)
           .then(() => salvarAcesso(email, secretaria))
           .catch(err => alert('Erro ao criar usuário: ' + err.message));
       } else {
@@ -147,7 +134,7 @@
     });
 
     function salvarAcesso(email, secretaria) {
-      db.collection('acessos').add({ email, secretaria, criadoEm: firebase.firestore.FieldValue.serverTimestamp() })
+      firebase.firestore().collection('acessos').add({ email, secretaria, criadoEm: firebase.firestore.FieldValue.serverTimestamp() })
         .then(() => {
           alert('Acesso cadastrado!');
           carregarAcessos();
@@ -159,7 +146,7 @@
     // Listar acessos
     function carregarAcessos() {
       const tbody = document.getElementById('acessosTableBody');
-      db.collection('acessos').orderBy('criadoEm', 'desc').get()
+      firebase.firestore().collection('acessos').orderBy('criadoEm', 'desc').get()
         .then(snapshot => {
           tbody.innerHTML = '';
           if (snapshot.empty) {
@@ -177,7 +164,7 @@
 
     // Logout admin
     document.getElementById('logoutAdminBtn').onclick = function() {
-      auth.signOut().then(() => {
+      firebase.auth().signOut().then(() => {
         window.location.href = 'index.html';
       });
     };
